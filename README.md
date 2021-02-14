@@ -119,3 +119,10 @@
 * Data Management
 * Design and Implementation
 * Management and Monitoring
+
+***
+
+### Other
+
+[devops-exercise](devops-exercise/README.md)
+
