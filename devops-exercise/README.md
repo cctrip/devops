@@ -379,5 +379,590 @@ IAC（基础结构即代码）是一种定义系统基础结构或体系结构�
 
 ***
 
+## 网络
 
+#### 什么是以太网
+
+以太网只是指当今使用的最常见的局域网（LAN）类型。与跨越较大地理区域的WAN（广域网）相比，LAN是在较小区域（如办公室，大学校园甚至家庭）的计算机连接网络。
+
+***
+
+#### 什么是TCP/IP
+
+一组协议，用于定义两个或多个设备如何相互通信。要了解有关TCP / IP的更多信息，请阅读(http://www.penguintutor.com/linux/basic-network-reference)
+
+***
+
+#### 什么是MAC地址？它是干什么用的？
+
+MAC地址是用于标识网络上各个设备的唯一标识号或代码。
+
+以太网上发送的数据包始终来自MAC地址，然后发送到MAC地址。如果网络适配器正在接收数据包，则它会将数据包的目标MAC地址与适配器自己的MAC地址进行比较。
+
+***
+
+#### 该MAC地址何时使用？：ff:ff:ff:ff:ff:ff:ff
+
+
+
+***
+
+#### 什么是IP地址
+
+Internet协议地址（IP地址）是分配给连接到使用Internet协议进行通信的计算机网络的每个设备的数字标签。IP地址具有两个主要功能：主机或网络接口标识和位置寻址。
+
+***
+
+#### 解释子网掩码并给出示例
+
+子网掩码是一个32位数字，用于屏蔽IP地址，并将IP地址分为网络地址和主机地址。子网掩码是通过将网络位设置为所有“ 1”并将主机位设置为所有“ 0”来实现的。在给定的网络中，有两个主机地址是为特殊目的保留的，不能分配给主机。为“ 0”地址分配了一个网络地址，为“ 255”分配了一个广播地址，并且不能将其分配给主机。
+
+例子
+
+```
+| Address Class | No of Network Bits | No of Host Bits | Subnet mask     | CIDR notation |
+| ------------- | ------------------ | --------------- | --------------- | ------------- |
+| A             | 8                  | 24              | 255.0.0.0       | /8            |
+| A             | 9                  | 23              | 255.128.0.0     | /9            |
+| A             | 12                 | 20              | 255.240.0.0     | /12           |
+| A             | 14                 | 18              | 255.252.0.0     | /14           |
+| B             | 16                 | 16              | 255.255.0.0     | /16           |
+| B             | 17                 | 15              | 255.255.128.0   | /17           |
+| B             | 20                 | 12              | 255.255.240.0   | /20           |
+| B             | 22                 | 10              | 255.255.252.0   | /22           |
+| C             | 24                 | 8               | 255.255.255.0   | /24           |
+| C             | 25                 | 7               | 255.255.255.128 | /25           |
+| C             | 28                 | 4               | 255.255.255.240 | /28           |
+| C             | 30                 | 2               | 255.255.255.252 | /30           |
+```
+
+***
+
+#### 什么是私有IP地址？什么时候使用它？
+
+
+
+***
+
+#### 解释OSI模型。有几层？每层负责什么？
+
+- Application: user end (HTTP is here)
+- Presentation: establishes context between application-layer entities (Encryption is here)
+- Session: establishes, manages and terminates the connections
+- Transport: transfers variable-length data sequences from a source to a destination host (TCP & UDP are here)
+- Network: transfers datagrams from one network to another (IP is here)
+- Data link: provides a link between two directly connected nodes (MAC is here)
+- Physical: the electrical and physical spec the data connection (Bits are here)
+
+***
+
+#### 对于以下每个方面，确定它属于哪个OSI层：
+
+* **Error correction**
+* **Packets routing - Network**
+* **Cables and electrical signals - Physical**
+* **MAC address - Data link**
+* **IP address - Network**
+* **Terminate connections - Session**
+* **3 way handshake - Transport**
+
+***
+
+#### 您熟悉哪些交付方案？
+
+Unitcast: 一对一通信，其中有一个发送方和一个接收方。
+
+Broadcast: 向网络中的每个人发送消息。地址ff：ff：ff：ff：ff：ff：ff用于广播。使用广播的两个常见协议是ARP和DHCP。
+
+Multicast: 向一组订户发送消息。它可以是一对多或多对多。
+
+***
+
+#### 什么是CSMA / CD？它用于现代以太网吗？
+
+CSMA / CD代表载波侦听多路访问/冲突检测。它的主要重点是管理对共享媒体/总线的访问，在该共享媒体/总线上，在给定的时间点只能传输一个主机。
+
+CSMA / CD算法：
+
+1. 在发送帧之前，它将检查其他主机是否已经在发送帧。
+2. 如果没有人发送，它将开始发送帧。
+3. 如果两个主机同时传输，则发生冲突。
+4. 两位主机都停止发送帧，并且向所有人发送“干扰信号”，通知所有人发生了冲突
+5. 他们正在等待随机时间，然后再次发送
+6. 每个主机等待随机时间后，便会尝试再次发送帧，因此
+
+***
+
+#### 描述以下网络设备及其之间的区别：
+
+* router
+* switch
+* hub
+
+***
+
+#### 路由器怎么工作？
+
+路由器是在两个或多个分组交换计算机网络之间传递信息的物理或虚拟设备。路由器检查给定数据包的目标Internet协议地址（IP地址），计算出到达目的地的最佳方式，然后进行相应的转发。
+
+***
+
+#### 什么是NAT
+
+网络地址转换（NAT）是一种过程，其中将一个或多个本地IP地址转换为一个或多个全局IP地址，反之亦然，以便为本地主机提供Internet访问。
+
+***
+
+#### 什么是代理？如何运作？我们需要什么？
+
+代理服务器充当您和Internet之间的网关。这是一个中间服务器，可将最终用户与他们浏览的网站分开。
+
+如果您使用的是代理服务器，则互联网流量会通过代理服务器到达您请求的地址。然后，该请求通过相同的代理服务器返回（此规则有例外），然后代理服务器将从网站接收的数据转发给您。
+
+代理服务器根据您的用例，需求或公司策略提供不同级别的功能，安全性和隐私。
+
+***
+
+#### 什么是TCP？如何运作？什么是三向握手？
+
+TCP三向握手或三向握手是在TCP / IP网络中用于在服务器和客户端之间建立连接的过程。
+
+三向握手主要用于创建TCP套接字连接。它在以下情况下起作用：
+
+1. 客户端节点通过IP网络将SYN数据包发送到同一或外部网络上的服务器。该数据包的目的是询问/推断服务器是否为新连接打开。
+2. 目标服务器必须具有可以接受和启动新连接的开放端口。当服务器从客户端节点接收到SYN数据包时，它会做出响应并返回确认收据-ACK数据包或SYN / ACK数据包。
+3. 客户端节点从服务器接收SYN / ACK并以ACK数据包作为响应。
+
+***
+
+#### 什么是往返延迟或往返时间？
+
+来自维基百科：“发送信号所花费的时间加上接收到该信号的确认所花费的时间”
+
+额外的问题：什么是局域网的RTT
+
+***
+
+#### SSL握手如何工作？
+
+
+
+***
+
+#### TCP和UDP有什么区别？
+
+TCP在客户端和服务器之间建立连接以保证程序包的顺序，另一方面，UDP不会在客户端和服务器之间建立连接，也不处理包顺序。这使UDP比TCP更轻巧，并且是流式传输等服务的理想选择。
+
+***
+
+#### 您熟悉哪些TCP / IP协议？
+
+
+
+***
+
+#### 解释"默认网关"
+
+默认网关用作网络计算机用来将信息发送到另一个网络或Internet中的计算机的访问点或IP路由器。
+
+***
+
+#### 什么是ARP？怎么工作？
+
+ARP代表地址解析协议。当您尝试ping本地网络上的IP地址（例如192.168.1.1）时，系统必须将IP地址192.168.1.1转换为MAC地址。这涉及使用ARP解析地址，因此也解析其名称。
+
+系统保留一个ARP查找表，在其中存储有关哪些IP地址与哪些MAC地址相关联的信息。尝试将数据包发送到IP地址时，系统将首先查阅此表以查看其是否已经知道MAC地址。如果缓存了一个值，则不使用ARP。
+
+***
+
+#### 什么是TTL？
+
+
+
+***
+
+#### 什么是DHCP？怎么工作？
+
+它代表动态主机配置协议，并为主机分配IP地址，子网掩码和网关。它是这样工作的：
+
+1. 主机进入网络后，广播一条消息以寻找DHCP服务器（DHCP DISCOVER）
+2. DHCP服务器将要约消息作为包含租赁时间，子网掩码，IP地址等的数据包发送回（DHCP OFFER）
+3. 根据所接受的报价，客户端将发送回广播，通知所有DHCP服务器（DHCP REQUEST）
+4. 服务器发送确认（DHCP ACK）
+
+***
+
+#### 什么是SSL隧道？如何运作？
+
+
+
+***
+
+#### 什么是Socket？您在哪里可以看到系统中的Sockets列表？
+
+
+
+
+
+***
+
+#### 什么是IPv6？如果拥有IPv4，为什么要考虑使用它？
+
+
+
+***
+
+#### 什么是VLAN？
+
+
+
+***
+
+#### 什么是MTU？
+
+
+
+***
+
+#### 如果发送的数据包大于MTU，该怎么办？
+
+
+
+
+
+***
+
+#### 对或错？。 Ping正在使用UDP，因为它不关心可靠的连接
+
+
+
+***
+
+#### 什么是SDN
+
+
+
+***
+
+#### 什么是ICMP？它是干什么用的？
+
+
+
+***
+
+#### 什么是NAT，如何工作？
+
+
+
+***
+
+#### 哪些因素影响网络性能？
+
+
+
+***
+
+#### 术语“数据平面”和“控制平面”指的是什么？
+
+确切含义通常取决于上下文，但是总体数据平面是指将数据包和/或帧从一个接口转发到另一个接口的所有功能。而控制平面是指使用路由协议的所有功能。
+
+还有“管理平面”，它涉及监视和管理功能。
+
+***
+
+#### 解释生成树协议（STP）
+
+
+
+***
+
+#### 什么是链路聚合？为什么使用它？
+
+
+
+***
+
+#### 什么是非对称路由？怎么处理呢？
+
+
+
+***
+
+#### 您熟悉哪些覆盖（隧道）协议？
+
+
+
+***
+
+#### 什么是GRE？如何运作？
+
+
+
+***
+
+#### 什么是VXLAN？如何运作
+
+
+
+***
+
+#### 什么是SNAT？
+
+
+
+***
+
+#### 解释OSPF
+
+
+
+***
+
+#### 解释latency
+
+
+
+***
+
+#### 解释bandwidth
+
+
+
+***
+
+#### 解释throughput
+
+
+
+***
+
+#### 执行搜索查询时，更重要的是延迟或吞吐量？以及如何确保对全球基础架构进行管理？
+
+延迟，为了获得良好的延迟，应将搜索查询转发到最近的数据中心。
+
+***
+
+#### 上传视频时，延迟或吞吐量更重要吗？以及如何保证呢？
+
+吞吐量。为了获得良好的吞吐量，应将上传流路由到未充分利用的链接。
+
+***
+
+#### 转发请求时还有什么其他注意事项（延迟和吞吐量除外）？
+
+保持缓存更新（这意味着可以将请求转发到最近的数据中心）
+
+***
+
+#### 解释spine & leaf
+
+
+
+***
+
+#### 什么是网络拥塞？是什么原因造成的？
+
+
+
+***
+
+#### 您能告诉我有关UDP数据包格式的哪些信息？那么TCP数据包格式呢？有什么不同？
+
+
+
+***
+
+#### 什么是指数补偿算法？在哪里使用？
+
+
+
+***
+
+#### 使用汉明码，后面的数据字100111010001101的代码字是什么？
+
+**00110011110100011101**
+
+***
+
+#### 给出在应用程序层中找到的协议示例
+
+* **Hypertext Transfer Protocol (HTTP) - used for the webpages on the internet**
+* Simple Mail Transfer Protocol (SMTP) - email 
+* transmissionTelecommunications Network - (TELNET) - terminal emulation to allow client access to telnet server
+* File Transfer Protocol (FTP) - facilitates transfer of files between any two machines
+* Domain Name System (DNS) - domain name translation
+* Dynamic Host Configuration Protocol (DHCP) - allocates IP addresses, subnet masks and gateways to hosts
+* **Simple Network Management Protocol (SNMP) - gathers data of devices on the network**
+
+***
+
+#### 给出在网络层中找到的协议的示例
+
+* **Internet Protocol (IP) - assists in routing packets from one machine to another**
+* **Internet Control Message Protocol (ICMP) - lets one know what is going such as error messages and debugging information**
+
+***
+
+#### 什么是HSTS
+
+HTTP严格传输安全性是一个Web服务器指令，该指令通知用户代理和Web浏览器如何通过一开始发送并返回到浏览器的响应标头来处理其连接。这将强制通过HTTPS加密进行连接，而忽略任何脚本调用以通过HTTP加载该域中的任何资源。
+
+**Read more [here]([https://www.globalsign.com/en/blog/what-is-hsts-and-how-do-i-use-it#:~:text=HTTP%20Strict%20Transport%20Security%20(HSTS,and%20back%20to%20the%20browser.)](https://www.globalsign.com/en/blog/what-is-hsts-and-how-do-i-use-it#:~:text=HTTP Strict Transport Security (HSTS,and back to the browser.))**
+
+***
+
+#### SSL和TLS之间有什么区别？
+
+
+
+***
+
+## Linux
+
+#### 您对Linux有什么经验？
+
+* Administration
+* Troubleshooting & Debugging
+* Storage
+* Networking
+* Development
+* **Deployments**
+
+***
+
+#### 与其他目录相比，/ tmp目录有什么特别之处？
+
+
+
+***
+
+#### 解释“ ls -l”命令输出中的每个字段
+
+文件权限，链接数，所有者名称，所有者组，文件大小，最后修改的时间戳和目录/文件名
+
+***
+
+#### 解释管道。您如何执行管道？
+
+Linux中使用管道，可以将一个管道的输出发送到另一个管道（也称为重定向）。例如：cat / etc / services | wc -l
+
+***
+
+#### 如何检查您过去执行的命令？
+
+
+
+***
+
+#### 您尝试删除文件，但失败。至少说出三种可能发生的原因
+
+* No more disk space
+* No more inodes
+* **No permissions**
+
+***
+
+#### 什么是systemd
+
+Systemd是一个守护程序（系统'd'，d代表守护程序）。 守护程序是在后台运行的程序，无需用户直接控制，尽管用户可以随时与守护程序对话。
+
+systemd具有许多功能，例如用户进程控制/跟踪，快照支持，禁止锁定。
+
+如果我们以分层方式可视化unix / linux系统，则systemd将直接落在linux内核之后。
+
+**Hardware -> Kernel -> Daemons, System Libraries, Server Display.**
+
+***
+
+#### 在使用systemd的系统上，如何显示日志？
+
+**`journalctl`**
+
+***
+
+#### 描述如何使某个流程/应用程序成为服务
+
+
+
+***
+
+#### Where system logs are located?
+
+
+
+***
+
+#### 如何在不每次打开文件的情况下跟踪文件的内容？
+
+
+
+***
+
+#### 您使用什么来解决网络问题并进行调试？
+
+
+
+***
+
+#### 您使用什么来解决磁盘和文件系统问题并进行调试？
+
+
+
+***
+
+#### 您使用什么来解决故障和调试process问题？
+
+
+
+***
+
+#### 您正在使用什么来调试与CPU相关的问题？
+
+
+
+***
+
+#### Explain iostat output
+
+
+
+***
+
+#### How to debug binaries?
+
+
+
+***
+
+#### 在/ proc中可以找到什么样的信息？
+
+
+
+***
+
+#### 您可以在/ proc中创建文件吗？
+
+
+
+***
+
+#### CPU负载和利用率之间有什么区别？
+
+
+
+***
+
+## 容器
+
+
+
+
+
+## Kubernetes
+
+
+
+
+
+## Go
 
