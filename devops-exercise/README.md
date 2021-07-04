@@ -1196,9 +1196,838 @@ Docker 镜像由一系列层构建而成。每一层代表镜像的 Dockerfile �
 
 ## Kubernetes
 
+***
+
+#### 什么是Kubernetes？为什么大家要使用它？
+
+Kubernetes 是一个开源系统，用于自动部署、扩展和管理容器化应用程序。
+
+要了解 Kubernetes 的优点，让我们看一些示例：
+
+* 您想在多个不同位置的容器中运行某个应用程序。当然，如果是 2-3 个服务器/位置，您可以自己完成，但将其扩展到其他多个位置可能具有挑战性。
+* 跨数百个容器执行更新和更改
+* 处理当前负载需要放大（或缩小）的情况。
+
+***
+
+#### 什么是k8s集群
+
+红帽定义：“Kubernetes 集群是一组用于运行容器化应用程序的节点机器。如果您正在运行 Kubernetes，那么您正在运行一个集群。一个集群至少包含一个工作节点和一个主节点。"
+
+Read more [here](https://www.redhat.com/en/topics/containers/what-is-a-kubernetes-cluster)
+
+***
+
+### Kubernetes Nodes
+
+#### 什么是Node？
+
+A node is a virtual machine or a physical server that serves as a worker for running the applications.
+It's recommended to have at least 3 nodes in Kubernetes production environment.
+
+***
+
+#### 主节点负责什么？
+
+master 协调集群中的所有工作流：
+
+* 调度应用
+* 管理期望状态
+* 滚动更新
+
+***
+
+#### 我们需要工作节点做什么？
+
+工作节点是运行应用程序和工作负载的节点
+
+***
+
+#### 什么是kubectl？
 
 
 
+***
+
+#### 运行哪个命令查看你的节点？
+
+`kubectl get nodes`
+
+***
+
+#### 主节点有哪些组件？
+
+
+  * API Server - the Kubernetes API. All cluster components communicate through it
+  * Scheduler - assigns an application with a worker node it can run on
+  * Controller Manager - cluster maintenance (replications, node failures, etc.)
+  * etcd - stores cluster configuration
+
+***
+
+#### 工作节点有哪些组件？
+
+
+  * Kubelet - an agent responsible for node communication with the master.
+  * Kube-proxy - load balancing traffic between app components
+  * Container runtime - the engine runs the containers (Podman, Docker, ...)
+
+****
+
+### Kubernetes Pod
+
+#### 解释什么是pod？
+
+
+
+***
+
+#### 使用nginx:alpine镜像部署一个名为”my-pod“的pod
+
+`kubectl run my-pod --image=nginx:alpine --restart=Never`
+
+***
+
+#### 一个Pod可以包含多少个container?
+
+多个容器，不过大多数情况下通常每个pod只有一个容器。
+
+***
+
+#### ”pods are ephemeral(短暂的)“意味着什么？
+
+这意味着它们最终会死亡并且pod无法愈合，因此建议您不要直接创建它们。
+
+***
+
+#### 运行哪个命令可以查看所有命名空间下的所有pod？
+
+`kubectl get pods --all-namespaces`
+
+***
+
+#### 如何删除一个pod？
+
+`kubectl delete pod $POD_NAME`
+
+***
+
+### Kubernetes Deployment
+
+#### 什么是Deployment？
+
+
+
+***
+
+#### 怎样创建一个deployment？
+
+
+```
+cat << EOF | kubectl create -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+EOF
+```
+
+***
+
+#### 如何编辑一个deployment？
+
+`kubectl edit deployment $NAME`
+
+***
+
+#### 当你编辑一个deployment并且改变了镜像后发生了什么？
+
+pod将被终止，一个新的pod将被创建。
+
+同时，当你查看replicaset时，你将看到老的replica已经没有任何pods，并且一个新的replicaset被创建
+
+***
+
+#### 如何删除一个deployment？
+
+`kubectl delete deployment $NAME` 
+
+`kubectl delele -f deployment.yaml`
+
+***
+
+#### 当你删除一个deployment时发生了什么？
+
+与deployment关联的pod将别终止，replicaset将被移除。
+
+***
+
+### Kubernetes Service
+
+#### 什么是Service？
+
+将在一组 Pod 上运行的应用程序公开为网络服务的抽象方法。
+
+简而言之，它允许您通过将永久 IP 地址附加到某个 pod 等方式来公开服务。
+
+**read more [here](https://kubernetes.io/docs/concepts/services-networking/service)**
+
+***
+
+#### Service类型有哪些？
+
+* ClusterIP
+* NodePort
+* LoadBalancer
+* ExternalName
+
+**More on this topic [here](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)**
+
+***
+
+#### 如何获取一个service的信息？
+
+`kubectl describe service $NAME`
+
+***
+
+#### 如何验证某个服务是否将请求转发到 pod?
+
+`kubectl describe service $NAME`找到"Endpoints"相关的信息是否匹配`kubectl get pod -o wide`的ip
+
+***
+
+#### external和internal service的区别？
+
+
+
+***
+
+#### 如何将下面的service暴露成到外部服务？
+
+
+
+
+```yaml
+spec:
+  selector:
+    app: some-app
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+```
+
+Adding `type: LoadBalancer` and `nodePort`
+
+```yaml
+spec:
+  selector:
+    app: some-app
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+      nodePort: 32412
+```
+
+***
+
+### Kubernetes Ingress
+
+#### 什么是Ingress？
+
+
+From Kubernetes docs: "Ingress exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. Traffic routing is controlled by rules defined on the Ingress resource."
+
+Read more [here](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+
+***
+
+#### 完成下面的Ingress配置
+
+<details>
+<summary>Complete the following configuration file to make it Ingress
+
+
+```yaml
+metadata:
+  name: someapp-ingress
+spec:
+```
+
+
+There are several ways to answer this question.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: someapp-ingress
+spec:
+  rules:
+  - host: my.host
+    http:
+      paths:
+      - backend:
+          serviceName: someapp-internal-service
+          servicePort: 8080
+```
+
+***
+
+#### 解释"host","http","backend"指示
+
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: someapp-ingress
+spec:
+  rules:
+  - host: my.host
+    http:
+      paths:
+      - backend:
+          serviceName: someapp-internal-service
+          servicePort: 8080
+```
+
+* `host`: 访问有效域名标识
+* `http`: 用于指定传入请求将使用 http 转发到内部服务的 http 行。
+* `backend`：内部service的名称和端口
+
+***
+
+#### 什么是Ingress Controller？
+
+Ingress 的实现。它基本上是另一个 pod（或一组 pod），负责评估和处理 Ingress 规则，并管理所有重定向。
+
+有多种 Ingress Controller 实现（来自 Kubernetes 的是 Kubernetes Nginx Ingress Controller）。
+
+***
+
+#### 使用Ingress的案例？
+
+* 多个子域名(多个主机条目，每个条目都有自己的服务)。
+* 一个域名有多个服务(多个路径与不同的service做映射)
+
+***
+
+#### 如何列出ingress在你的namespace？
+
+`kubectl list ingress`
+
+***
+
+### Kubernetes Configuration File
+
+#### 配置文件结构
+
+
+It has three main parts:
+
+1. Metadata
+2. Specification
+3. Status (this automatically generated and added by Kubernetes)
+
+***
+
+#### 获取deployment的最新配置
+
+`kubectl get deployment [deployment_name] -o yaml`
+
+***
+
+#### k8s从哪里获取状态数据？
+
+etcd
+
+***
+
+### Kubernetes etcd
+
+#### 什么是etcd？
+
+
+
+***
+
+### Namespace
+
+#### 什么是namespace？
+
+命名空间允许您将集群拆分为虚拟集群，您可以在其中以有意义且与其他组完全分离的方式对应用程序进行分组。
+
+***
+
+#### 为什么使用命名空间？使用一个命名空间有什么问题？
+
+单独使用默认命名空间时，随着时间的推移，很难了解您在集群中管理的所有应用程序。命名空间使将应用程序组织成有意义的组变得更容易，例如所有监控应用程序的命名空间和所有安全应用程序的命名空间等。
+
+命名空间也可用于管理蓝/绿环境，其中每个命名空间可以包含不同版本的应用程序，还可以共享其他命名空间（如日志记录、监控等命名空间）中的资源。
+
+命名空间的另一个用例是一个集群、多个团队。当多个团队使用同一个集群时，他们最终可能会互相踩踏。例如，如果他们最终创建了一个同名的应用程序，这意味着其中一个团队覆盖了另一个团队的应用程序，因为 Kubernetes 中不能有太多同名的应用程序（在同一个命名空间中）。
+
+***
+
+#### 哪些特殊命名空间在创建集群时自动创建？
+
+
+* default
+* kube-system
+* kube-public
+* kube-node-lease
+
+***
+
+#### kube-system命名空间中有啥？
+
+
+* Master and Kubectl processes
+* System processes
+
+***
+
+#### kube-public命名空间中有啥？
+
+
+* A configmap, which contains cluster information
+* Publicely accessible data
+
+***
+
+#### kube-node-lease 命名空间有啥？
+
+It holds information on hearbeats of nodes. Each node gets an object which holds information about its availability.
+
+***
+
+#### 什么是”Resource Quota“？
+
+
+
+***
+
+#### 如何创建一个Resource Quota？
+
+`kubectl create quota some-quota --hard-cpu=2,pods=2`
+
+***
+
+### Kubernetes Commands
+
+#### kubectl exec
+
+
+
+***
+
+#### kubectl get
+
+
+
+***
+
+#### kubectl api-resources
+
+
+
+***
+
+#### kubectl apply
+
+
+
+***
+
+#### kubectl describe
+
+
+
+***
+
+#### kubectl expose
+
+
+
+***
+
+#### kubectl run
+
+
+
+***
+
+#### kubectl create
+
+
+
+***
+
+#### kubectl delete
+
+
+
+***
+
+#### kubectl logs
+
+
+
+
+
+***
+
+#### kubectl scale
+
+
+
+***
+
+#### 什么是Minikube
+
+
+
+***
+
+#### 怎么监控k8s
+
+
+
+***
+
+#### 你怀疑其中一个pod有问题，你会怎么做？
+
+
+
+***
+
+#### k8s调度器做了什么？
+
+
+
+***
+
+#### 当你停止kubelet时，正在运行的pod会发生什么？
+
+
+
+***
+
+#### 当pod使用的内存超出时会发生什么？
+
+
+
+***
+
+#### 描述回滚的工作原理？
+
+
+
+***
+
+#### 什么是control loop?如何工作的？
+
+Explained [here](https://www.youtube.com/watch?v=i9V4oCa5f9I)
+
+***
+
+### Kubernetes Operator
+
+#### 什么是Operator？
+
+
+Explained [here](https://kubernetes.io/docs/concepts/extend-kubernetes/operator)
+
+"Operators are software extensions to Kubernetes that make use of custom resources to manage applications and their components. Operators follow Kubernetes principles, notably the control loop."
+
+***
+
+#### 为什么我们需要Operators？
+
+
+The process of managing stateful applications in Kubernetes isn't as straightforward as managing stateless applications where reaching the desired status and upgrades are both handled the same way for every replica. In stateful applications, upgrading each replica might require different handling due to the stateful nature of the app, each replica might be in a different status. As a result, we often need a human operator to manage stateful applications. Kubernetes Operator is suppose to assist with this.
+
+This also help with automating a standard process on multiple Kubernetes clusters
+
+***
+
+#### Operator由哪些组件组成？
+
+
+1. CRD (custom resource definition)
+2. Controller - Custom control loop which runs against the CRD
+
+***
+
+#### Operator如何工作？
+
+It uses the control loop used by Kubernetes in general. It watches for changes in the application state. The difference is that is uses a custom control loop.
+In additions.
+
+In addition, it also makes use of CRD's (Custom Resources Definitions) so basically it extends Kubernetes API.
+
+***
+
+#### Operator框架有什么组成？
+
+
+1. Operator SDK - allows developers to build operators
+2. Operator Lifecycle Manager - helps to install, update and generally manage the lifecycle of all operators
+3. Operator Metering - Enables usage reporting for operators that provide specialized services
+
+***
+
+#### 描述Operator Lifecycle Manager的细节
+
+It's part of the Operator Framework, used for managing the lifecycle of operators. It basically extends Kubernetes so a user can use a declarative way to manage operators (installation, upgrade, ...).
+
+***
+
+#### 什么是Kubeconfig？使用它做什么？
+
+
+
+***
+
+#### 解释StatefulSet
+
+
+
+***
+
+#### Kubernetes ReplicaSet
+
+#### ReplicaSet的目的是啥？
+
+
+
+***
+
+#### replicaset如何工作？
+
+
+
+***
+
+#### 当replicaSet死亡时会发生什么？
+
+
+
+***
+
+#### Kubernetes Secrets
+
+#### 解释secrets
+
+Secrets let you store and manage sensitive information (passwords, ssh keys, etc.)
+
+***
+
+#### 如何创建Secret
+
+
+
+***
+
+#### Secret 类型有哪些？
+
+
+
+***
+
+#### Kubernetes Storage
+
+#### 解释”持久卷“。为什么我们需要它？
+
+Persistent Volumes allow us to save data so basically they provide storage that doesn't depend on the pod lifecycle.
+
+***
+
+#### 持久卷类型
+
+
+
+***
+
+#### 什么是PersistentVolumeClaim?
+
+
+
+***
+
+#### 解释Storage Class
+
+
+
+***
+
+#### 解释Dynamic和Static Provisioning
+
+
+
+***
+
+#### 解释Access Modes
+
+
+
+
+
+***
+
+#### 解释Reclaim Policy？
+
+
+
+***
+
+#### Kubernetes Access Control
+
+#### 什么是RBAC？
+
+
+
+***
+
+#### Role和RoleBinding
+
+
+
+#### Role和ClusterRole的区别？
+
+
+
+***
+
+#### Kubernetes Misc
+
+#### 解释什么是k8s Service Discovery
+
+
+
+***
+
+#### kube proxy做了什么？
+
+
+
+***
+
+#### 解释ConfigMap
+
+Separate configuration from pods.
+It's good for cases where you might need to change configuration at some point but you don't want to restart the application or rebuild the image so you create a ConfigMap and connect it to a pod but externally to the pod.
+
+Overall it's good for:
+
+* Sharing the same configuration between different pods
+* Storing external to the pod configuration
+
+***
+
+#### 如何使用ConfigMaps
+
+
+1. Create it (from key&value, a file or an env file)
+2. Attach it. Mount a configmap as a volume
+
+***
+
+#### 解释"Horizontal Pod Autoscaler"
+
+Scale the number of pods automatically on observed CPU utilization.
+
+***
+
+#### 解释Liveness probe
+
+
+
+***
+
+#### 解释Readiness probe
+
+
+
+***
+
+#### 云原生是什么意思？
+
+
+
+***
+
+#### 解释关于 kubernetes 的基础设施的宠物和牛方法
+
+
+
+***
+
+####描述您如何在 K8s 中运行容器化 Web 应用程序，该应用程序应该可以从公共 URL 访问。
+
+
+
+***
+
+#### 如何某些应用不可达，你如何排查故障？
+
+
+
+***
+
+#### 描述 Kubernetes 世界中有哪些 CustomResourceDefinitions？它们可以用来做什么？
+
+
+
+***
+
+#### k8s中调度如何工作？
+
+
+The control plane component kube-scheduler asks the following questions,
+
+1. What to schedule? It tries to understand the pod-definition specifications
+2. Which node to schedule? It tries to determine the best node with available resources to spin a pod
+3. Binds the Pod to a given node
+
+View more [here](https://www.youtube.com/watch?v=rDCWxkvPlAw)
+
+***
+
+#### 如何使用lables和selectors？
+
+
+
+***
+
+#### 解释CronJob，什么时候使用它？
+
+
+
+***
+
+#### QoS种类？
+
+
+* Guaranteed
+* Burstable
+* BestEffort
+
+***
+
+#### Istio
+
+#### 什么是Istio？什么时候用它？
+
+***
 
 ## Go
 
