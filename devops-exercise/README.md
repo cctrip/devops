@@ -954,9 +954,142 @@ systemd具有许多功能，例如用户进程控制/跟踪，快照支持，禁
 
 ## 容器
 
+#### 什么是容器？它是做什么用的？
+
+容器是操作系统虚拟化的一种形式。单个容器可用于运行从小型微服务或软件进程到大型应用程序的任何内容。容器内包含所有必要的可执行文件、二进制代码、库和配置文件，使它们易于在不同机器上交付和运行，并具有相同的预期结果。
+
+***
+
+#### 容器与虚拟机 (VM) 有何不同？
+
+容器和虚拟机之间的主要区别在于，容器允许您在操作系统上虚拟化多个工作负载，而在虚拟机的情况下，硬件被虚拟化以运行多台机器，每台机器都有自己的操作系统。您也可以将其视为容器用于操作系统级虚拟化，而 VM 用于硬件虚拟化。
+
+* 容器不需要整个操作系统作为 VM。容器共享系统内核而不是虚拟机。
+* 设置容器通常只需要几秒钟，而VMs可能需要几分钟，至少是比容器花更多的时间，因为需要有一个完整的操作系统来启动和初始化，而不像在容器中，你只需要启动应用本身。
+* 容器彼此隔离，但不像虚拟机那么具体。恶意用户有可能从容器闯入主机操作系统，反之亦然。
+
+***
+
+#### 在哪些情况下您会使用容器以及您更愿意在哪些情况下使用虚拟机？
+
+在以下情况下，您应该选择 VM：
+
+* 您需要运行一个需要操作系统所有资源和功能的应用程序。
+* 你需要完全隔离和安全。
+
+你应该在什么时候选择容器：
+
+* 你需要一个轻量级的解决方案。
+* 运行单个应用程序的多个版本或实例。
+
+***
+
+#### 解释 Podman 或 Docker 架构
 
 
 
+***
+
+#### 详细描述一下运行`podman/docker run hello-world`会发生什么？
+
+Docker CLI 将您的请求传递给 Docker 守护进程。Docker 守护程序从 Docker Hub 下载映像， Docker 守护程序使用它下载的映像创建一个新容器， Docker 守护程序将输出从容器重定向到 Docker CLI，Docker CLI 将其重定向到标准输出。
+
+***
+
+#### 什么是`dockerd、docker-containerd、docker-runc、docker-containerd-ctr、docker-containerd-shim`？
+
+* dockerd - Docker 守护进程本身。您列表中的最高级别组件，也是唯一列出的“Docker”产品。提供 Docker 的所有优秀 UX 功能。
+
+* (docker-)containerd - 也是一个守护进程，监听 Unix 套接字，公开 gRPC 端点。处理所有底层容器管理任务、存储、镜像分发、网络连接等...
+
+* docker-)containerd-ctr - 直接与 containerd 通信的轻量级 CLI。将其视为“docker”与“dockerd”的关系。
+
+* (docker-)runc - 用于实际运行容器的轻量级二进制文件。处理与 Linux 功能（如 cgroups、命名空间等）的低级接口...
+
+* (docker-)containerd-shim - 在 runC 实际运行容器后，它退出（允许我们没有任何长期运行的进程负责我们的容器）。shim是位于 containerd 和 runc 之间的组件，以促进这一点。
+
+  ![](docker-shim.png)
+
+***
+
+#### 描述 cgroups 和命名空间之间的区别
+
+* cgroup: 控制组提供了一种将任务集及其所有未来子项聚合/划分为具有特定行为的分层组的机制。
+* namespace：将全局系统资源包装在一个抽象中，使命名空间内的进程看起来他们拥有自己的全局资源的隔离实例。
+
+Cgroups = limits how much you can use; namespaces = limits what you can see (and therefore use)
+
+Cgroups involve resource metering and limiting: memory CPU block I/O network
+
+Namespaces provide processes with their own view of the system
+
+Multiple namespaces: pid,net, mnt, uts, ipc, user
+
+***
+
+#### 详细描述运行`docker pull image:tag`时会发生什么？
+
+* Docker CLI 将您的请求传递给 Docker 守护进程。 Dockerd Logs 展示了这个过程 docker.io/library/busybox:latest 解析为具有 9 个条目的 manifestList 对象；寻找未知/amd64 匹配
+
+* 找到与 linux/amd64 匹配的媒体类型 application/vnd.docker.distribution.manifest.v2+json，摘要 sha256:400ee2ed939df769d4681023810d2e4fb9479b8401d97003c710d0e20f7c4
+
+* 拉 blob "sha256:61c5ed1cbdf8e801f3b73d906c61261ad916b2532d6756e7c4fbcacb975299fb 下载 61c5ed1cbdf8 到临时文件 /var/lib/docker/tmp/GetImage36
+
+* 在 /var/lib/docker/overlay2/507df36fe373108f19df4b22a07d10de7800f33c9613acb139827ba2645444f7/diff" storage-driver=overlay2 中应用 tar
+* 应用 tar sha256: 514c3a3e64d4ebf15f482c9e8909d130bcd53bcc452f0225b0a04744de7b8c43 到 507df36fe373108f19df4b208f19df4b20a0737373737373400000000000000000
+
+***
+
+#### 你如何运行容器？
+
+**`podman run` or `docker run`**
+
+***
+
+#### `podman commit` 有什么作用？你什么时候使用它？
+
+根据容器的更改创建新映像
+
+***
+
+#### 您将如何将数据从一个容器传输到另一个容器？
+
+
+
+****
+
+#### 当容器存在时，容器的数据会发生什么变化？
+
+
+
+***
+
+#### 解释以下每个命令的作用：
+
+- docker run
+- docker rm
+- docker ps
+- docker pull
+- docker build
+- docker commit
+
+***
+
+#### 如何删除旧的、未运行的容器？
+
+1. 要删除一个或多个 Docker 映像，请使用 docker container rm 命令，后跟要删除的容器的 ID。
+2. docker system prune 命令将删除所有停止的容器、所有悬空的镜像和所有未使用的网络。
+3. docker rm $(docker ps -a -q) - 此命令将删除所有停止的容器。命令 docker ps -a -q 将返回所有现有的容器 ID 并将它们传递给将删除它们的 rm 命令。任何正在运行的容器都不会被删除。
+
+***
+
+### Dockerfile
+
+***
+
+
+
+***
 
 ## Kubernetes
 
