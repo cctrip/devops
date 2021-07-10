@@ -69,7 +69,7 @@
   * Chef
   * Puppet
 * Container Orchestration
-  * Kubernetes
+  * [Kubernetes](iaas/kubernetes/README.md)
   * Mesos
   * Swarm
 * Infrastructure Provisioning
