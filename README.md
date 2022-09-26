@@ -126,3 +126,7 @@
 
 [devops-exercise](devops-exercise/README.md)
 
+[days-devops](days-devops/README.md)
+
+
+
