@@ -4,7 +4,7 @@
 
 ## Progress
 
-- [✔️] ♾️ 1 > [Introduction](Days/day01.md)
+- [✔️] ♾️ 1 > [介绍](day01.md)
 
 ### What is and why do we use DevOps
 
